@@ -1,5 +1,5 @@
-streamlit==1.41.1
+streamlit
 qdrant_client
 sentence_transformers
-python==3.9.21
+python
 
