@@ -1,3 +1,4 @@
+
 from qdrant_client import QdrantClient
 import json
 from sentence_transformers import SentenceTransformer
@@ -10,7 +11,6 @@ def client_model():
     )
     return qdrant_client
 
-# print(qdrant_client.get_collections())
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 client = QdrantClient(":memory:")
 
@@ -22,6 +22,7 @@ def readJson(filename):
         # Load the JSON data into a dictionary
         documents = json.load(file)
     return documents
+
 points = []
 
 from qdrant_client.http import models
@@ -60,14 +61,13 @@ def search(search_query, num):
     **{hit.payload['event_org']}** \n 
     **Date:** {hit.payload['date']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **location:** {hit.payload['loc']}
 ''')
-        st.write(hit.payload['event_title'])
+        st.write(hit.payload['event_desc'])
 
 
 
 
-st.title("EventConnect")
-st.header("hello")
-search_query = st.text_input("Enter text to search")
+st.title("EventConnect - IITD")
+search_query = st.text_input('',placeholder="Enter text to search")
 if (len(search_query.strip())>1):
     search(search_query,3)
 
@@ -76,21 +76,6 @@ if (len(search_query.strip())>1):
 st.sidebar.header("Filters")
 options = st.sidebar.multiselect('Tell your preferences:', ['Tech', 'Cultural', 'Academic', 'ARIES', 'EDC', 'OCS', 'IGTS'], ['Tech', 'EDC', 'IGTS'])
 #displaying the selected options
-st.sidebar.write('You have selected:', options)
 st.header("Recommendations")
-# for entry in options: 
-#     if len(options)>=3:
-#         search(entry,1)
-#     else:
-#         st.write(entry,3)
+
 search(options, 5)
-# from flask import Flask, render_template
-
-# app = Flask(_name_)
-
-# @app.route('/')
-# def home():
-#     return render_template('./index.html')  # Assuming index.html is in the 'templates' folder
-
-# if _name_== '_main_':
-#     app.run(debug=True)
