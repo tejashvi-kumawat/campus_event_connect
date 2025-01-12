@@ -1,81 +1,134 @@
-
 from qdrant_client import QdrantClient
 import json
 from sentence_transformers import SentenceTransformer
 import streamlit as st
-
-def client_model():
-    qdrant_client = QdrantClient(
-        url="https://4341ac7b-ffd3-4a57-8408-cf157cdfb9eb.europe-west3-0.gcp.cloud.qdrant.io:6333", 
-        api_key="t21ieDMt7FRFM0kSSLyRZhR4sFvIXeCQ9SXfiMbOalFo4p4aaUpE-Q"
-    )
-    return qdrant_client
-
-encoder = SentenceTransformer("all-MiniLM-L6-v2")
-client = QdrantClient(":memory:")
-
-
-
-# Open the JSON file
-def readJson(filename):
-    with open(filename, 'r') as file:
-        # Load the JSON data into a dictionary
-        documents = json.load(file)
-    return documents
-
-points = []
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 from qdrant_client.http import models
 from qdrant_client.http.models import PointStruct
-client.create_collection(
-    collection_name="my_books",
-    vectors_config=models.VectorParams(
-        size=encoder.get_sentence_embedding_dimension(),  # Vector size is defined by used model
-        distance=models.Distance.COSINE, 
-    ),
-)
 
-def encoding():
-    for idx, doc in enumerate(readJson('1.json')):
-        vector = encoder.encode(doc["event_desc"]).tolist()
-        point = models.PointStruct(
-            id=idx, vector=vector, payload=doc
+class EventSearch:
+    def __init__(self):
+        self.encoder = SentenceTransformer("all-MiniLM-L6-v2")
+        self.client = QdrantClient(":memory:")
+        self.documents = None
+        self.setup_collection()
+        
+    def setup_collection(self):
+        """Initialize Qdrant collection with proper configuration"""
+        self.client.create_collection(
+            collection_name="my_books",
+            vectors_config=models.VectorParams(
+                size=self.encoder.get_sentence_embedding_dimension(),
+                distance=models.Distance.COSINE,
+            ),
         )
-        points.append(point)
-    client.upload_points(
-        collection_name="my_books",
-        points= points,
+        
+    def read_json(self, filename):
+        """Read and cache JSON data"""
+        with open(filename, 'r') as file:
+            self.documents = json.load(file)
+        return self.documents
+    
+    def prepare_documents_for_search(self):
+        """Prepare document texts for search"""
+        return [doc["event_desc"] for doc in self.documents]
+    
+    def keyword_search(self, query, documents_text):
+        """Perform keyword-based search using TF-IDF"""
+        tfidf_vectorizer = TfidfVectorizer()
+        tfidf_matrix = tfidf_vectorizer.fit_transform(documents_text)
+        query_vector = tfidf_vectorizer.transform([query])
+        return cosine_similarity(query_vector, tfidf_matrix).flatten()
+    
+    def semantic_search(self, query, documents_text):
+        """Perform semantic search using sentence embeddings"""
+        doc_embeddings = self.encoder.encode(documents_text)
+        query_embedding = self.encoder.encode([query])
+        return cosine_similarity(query_embedding, doc_embeddings).flatten()
+    
+    def hybrid_search(self, query, num_results=5, alpha=0.5):
+        """Perform hybrid search combining keyword and semantic search"""
+        if not self.documents:
+            self.read_json('1.json')
+            
+        documents_text = self.prepare_documents_for_search()
+        
+        # Get scores from both search methods
+        keyword_scores = self.keyword_search(query, documents_text)
+        semantic_scores = self.semantic_search(query, documents_text)
+        
+        # Combine scores
+        hybrid_scores = alpha * keyword_scores + (1 - alpha) * semantic_scores
+        
+        # Get top results
+        top_indices = np.argsort(hybrid_scores)[::-1][:num_results]
+        results = []
+        
+        for idx in top_indices:
+            results.append({
+                'document': self.documents[idx],
+                'score': hybrid_scores[idx]
+            })
+            
+        return results
+
+def main():
+    st.title("EventConnect")
+    
+    # Initialize search engine
+    search_engine = EventSearch()
+    
+    # Sidebar filters
+    st.sidebar.header("Filters")
+    options = st.sidebar.multiselect(
+        'Tell your preferences:', 
+        ['Tech', 'Cultural', 'Academic', 'ARIES', 'EDC', 'OCS', 'IGTS'],
+        ['Tech', 'EDC', 'IGTS']
     )
     
-def search(search_query, num):
-    encoding()
-    hits = client.query_points(
-        collection_name="my_books",
-        query=encoder.encode(" ".join(search_query)).tolist(),
-        limit=num,
-    ).points
-    for hit in hits:
-        print(hit.payload, "score:", hit.score)
-        st.markdown(f'''
-    #### {hit.payload['event_title']}
-    **{hit.payload['event_org']}** \n 
-    **Date:** {hit.payload['date']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **location:** {hit.payload['loc']}
-''')
-        st.write(hit.payload['event_desc'])
+    # Search weight slider
+    alpha = st.sidebar.slider(
+        'Adjust search balance',
+        0.0, 1.0, 0.5,
+        help='0 = Pure Semantic Search, 1 = Pure Keyword Search'
+    )
+    
+    # Main search interface
+    search_query = st.text_input("Enter text to search")
+    
+    if len(search_query.strip()) > 1:
+        results = search_engine.hybrid_search(search_query, num_results=3, alpha=alpha)
+        
+        st.header("Search Results")
+        for result in results:
+            doc = result['document']
+            score = result['score']
+            
+            st.markdown(f"""
+            #### {doc['event_title']}
+            **Organization:** {doc['event_org']}  
+            **Date:** {doc['date']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Location:** {doc['loc']}  
+            **Relevance Score:** {score:.2f}
+            """)
+            st.markdown("---")
+    
+    # Recommendations based on preferences
+    if options:
+        st.header("Recommendations Based on Preferences")
+        for preference in options:
+            results = search_engine.hybrid_search(preference, num_results=2, alpha=alpha)
+            
+            st.subheader(f"Based on '{preference}' preference:")
+            for result in results:
+                doc = result['document']
+                st.markdown(f"""
+                #### {doc['event_title']}
+                **Organization:** {doc['event_org']}  
+                **Date:** {doc['date']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Location:** {doc['loc']}
+                """)
+                st.markdown("---")
 
-
-
-
-st.title("EventConnect - IITD")
-search_query = st.text_input('',placeholder="Enter text to search")
-if (len(search_query.strip())>1):
-    search(search_query,3)
-
-# Streamlit
-#sidebar
-st.sidebar.header("Filters")
-options = st.sidebar.multiselect('Tell your preferences:', ['Tech', 'Cultural', 'Academic', 'ARIES', 'EDC', 'OCS', 'IGTS'], ['Tech', 'EDC', 'IGTS'])
-#displaying the selected options
-st.header("Recommendations")
-
-search(options, 5)
+if __name__ == "__main__":
+    main()
