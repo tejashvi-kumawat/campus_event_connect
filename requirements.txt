@@ -1,4 +1,4 @@
-steramlit
+streamlit
 qdrant_client
 sentence_transformers
 json
