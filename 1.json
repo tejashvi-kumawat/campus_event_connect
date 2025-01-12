@@ -1,1 +1,58 @@
-
+[
+    {
+        "event_desc": "minor change with report submission deadline. You will be required to submit report within a week after completing the experiment. This would mean you will be submitting report next week, and start next experiment. If report submission day happens to be a holiday, you will be required to submit report very next working day.",
+        "event_title": "Report Submission Deadline Change",
+        "event_org": "Aravind Krishna Swamy, Ph.D., Professor, Department of Civil Engineering, Indian Institute of Technology Delhi",
+        "date": null,
+        "loc": "Indian Institute of Technology Delhi, Hauz Khas, New Delhi – 110016"
+    },
+    {
+        "event_desc": "Orientation session which is mandatory for students wishing to availPlacement / Summer Internship services in Phase II. The aim of the orientation is to give you information about: 1. All the policies and procedures of Internships & Placements Phase II, for the ongoing session.2. A demonstration of the online resume building and OCS application portal 3. Demonstration and doubt clearing regarding other processes planned. The Orientation will be followed by a workshop on Mentza- an AI assessment and interview prep platform to help students transition from academics to careers smoothly.",
+        "event_title": "Mandatory Orientation Session for Placement/Summer Internship Services",
+        "event_org": "Office of Career Services, Indian Institute of Technology Delhi",
+        "date": "8th January 2025, Wednesday",
+        "loc": "LH 325"
+    },
+    {
+        "event_desc": "Mathematics Department colloquium by Prof. Viswanathan Arunachalam, National University of Colombia, Bogotá, Colombia. In this talk, we present the updated estimation method to improve the forecasts for the population dynamics under SEIR epidemic models with stochastic perturbations. The models for the population dynamics under SEIR epidemic models with stochastic perturbations are analyzed for the dynamics of the COVID-19 pandemic in Bogotá and Acute respiratory infection(ARI) driven by the particulate matter PM2.5 and PM10 on the air quality due to climate change in Bogotá., Colombia. Computational experiments for the stochastic model with random perturbations were performed, and the model parameters were updated in their estimates.",
+        "event_title": "Mathematics Department Colloquium",
+        "event_org": "Mathematics Department Colloquium Team",
+        "date": "15th Jan 2025 between 4:30 and 5:30 pm",
+        "loc": "Room No. 540, Academic Complex West (99 B)"
+    },
+    {
+        "event_desc": "An interactive workshop on crafting an impactful CV, tailored for all students, including research scholars. Dr. Kumari will provide valuable insights into crafting an effective CV, address common concerns, and answer your questions related to CV preparation.",
+        "event_title": "CV-Making Workshop",
+        "event_org": "Office of Career Services, Indian Institute of Technology Delhi",
+        "date": "January 9, 2025 (Thursday), 5:00 PM – 6:00 PM",
+        "loc": "LH 325"
+    },
+    {
+        "event_desc": "Art competition for IITD students on the themes of Equity, Diversity, Equality, and Intersectionality in the context of Gender-Based Violence. Illustrations, paintings, and digital art are welcome. The top three art pieces will receive Amazon gift vouchers worth Rs. 5000, Rs. 3000, and Rs. 2000, respectively. Certificates will also be provided to the winners.",
+        "event_title": "IGES Art Competition: Raise Your Voice Against Gender-Based Violence",
+        "event_org": "Initiative for Gender Equity and Sensitisation (IGES), IIT Delhi",
+        "date": "10th January 2025",
+        "loc": "IIT Delhi, Hauz Khas, New Delhi - 110016"
+    },
+    {
+        "event_desc": "One-day advanced hands-on workshop on Light Sheet Fluorescence Microscopy (LSFM). Workshop highlights: Principles and applications of LSFM, Setup and operation of LSFM systems, Sample preparation for optimal imaging, Data acquisition and analysis methodologies, Troubleshooting common challenges in LSFM.",
+        "event_title": "Hands-On Workshop on Light Sheet Fluorescence Microscopy",
+        "event_org": "SATHI Foundation IIT Delhi in association with ZEISS",
+        "date": "28 January 2025",
+        "loc": "IITD Sonipat Campus, Sonipat"
+    },
+    {
+        "event_desc": "IKS seminar by Chaitanya Charan Das. This session will explore how effective mind management can empower individuals to: Manage stress in modern work culture, Improve focus and productivity for better outcomes, Make wiser decisions by balancing emotion and intelligence, Plan effectively for the future, Navigate challenges like failure, FOMO, and peer pressure.",
+        "event_title": "IKS Seminar: Mind Management: The Key to Mastering Life",
+        "event_org": "Lalan Kumar, PhD, SMIEEE, Associate Professor, Department of Electrical Engineering, Bharti School of Telecommunication, and, Yardi School of Artificial Intelligence, Indian Institute of Technology Delhi",
+        "date": "8th Jan 2024 (Wednesday), 6:00PM",
+        "loc": "LH 114"
+    },
+    {
+        "event_desc": "Lab Slot Change. A google form is provided to indicate preferred lab slots. Please fill this in by 11:59 pm tonight (Wednesday, January 8). Provide exactly 2 slots that you’d want to switch to. No more requests for swaps will be entertained.",
+        "event_title": "Lab Slot Change Request",
+        "event_org": "Instructor Nikhil Balaji, The Piazza Team",
+        "date": "Wednesday, January 8",
+        "loc": null
+    }
+]
