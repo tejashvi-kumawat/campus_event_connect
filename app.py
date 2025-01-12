@@ -1,7 +1,6 @@
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 import streamlit as st
-import flask
 # from google.colab import userdata
 qdrant_client = QdrantClient(
     url="https://4341ac7b-ffd3-4a57-8408-cf157cdfb9eb.europe-west3-0.gcp.cloud.qdrant.io:6333", 
