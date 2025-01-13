@@ -17,6 +17,22 @@ def init_db():
     conn.commit()
     conn.close()
 
+def download_database():
+    try:
+        with open("users.db", "rb") as db_file:
+            st.download_button(
+                label="Download Database",
+                data=db_file,
+                file_name="users.db",
+                mime="application/octet-stream"
+            )
+    except FileNotFoundError:
+        st.error("Database file not found!")
+
+# Add this functionality to your app
+if st.sidebar.button("Download Database"):
+    download_database()
+
 def hash_password(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
 
