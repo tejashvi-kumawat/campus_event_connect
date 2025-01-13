@@ -54,7 +54,13 @@ def check_auth_cookie():
         
         # Check if cookie has expired
         if cookie_data['expiry'] > time.time():
-            if check_credentials(cookie_data['username'], cookie_data['password_hash']):
+            conn = sqlite3.connect('users.db')
+            c = conn.cursor()
+            c.execute('SELECT password FROM users WHERE username=?', (cookie_data['username'],))
+            result = c.fetchone()
+            conn.close()
+            
+            if result and result[0] == cookie_data['password_hash']:
                 st.session_state['logged_in'] = True
                 st.session_state['username'] = cookie_data['username']
                 return True
@@ -71,25 +77,29 @@ def login_func(login_username,login_password):
         st.error("Invalid username or password")
 
 def main():
-    # login_func(st.session_state['username'], st.session_state['password'])
-
     st.title('Login Page')
     
     # Initialize the database
     init_db()
     
-    # Create tabs for login and registration
+    # Active tab management
+    if 'active_tab' not in st.session_state:
+        st.session_state.active_tab = "Login"
+    
+    # Create tabs
     tab1, tab2 = st.tabs(["Login", "Register"])
     
     with tab1:
+        st.session_state.active_tab = "Login"
         st.header("Login")
         login_username1 = st.text_input("Username", key="login_username")
         login_password1 = st.text_input("Password", type="password", key="login_password")
         
         if st.button("Login", key="login_button"):
-            login_func(login_username1,login_password1)
+            login_func(login_username1, login_password1)
     
     with tab2:
+        st.session_state.active_tab = "Register"
         st.header("Register")
         reg_username = st.text_input("Username", key="reg_username")
         reg_password = st.text_input("Password", type="password", key="reg_password")
@@ -101,10 +111,15 @@ def main():
             elif not reg_username or not reg_password:
                 st.error("Please fill in all fields!")
             else:
-                save_user(reg_username, reg_password)
-                st.success("Registration successful! Please login.")
-                st.session_state.active_tab = 0
-                st.rerun()
+                try:
+                    save_user(reg_username, reg_password)
+                    st.success("Registration successful!")
+                    save_auth_cookie(reg_username, reg_password)
+                    st.session_state['logged_in'] = True
+                    st.session_state['username'] = reg_username
+                    st.rerun()
+                except sqlite3.IntegrityError:
+                    st.error("Username already exists!")
 def download_database():
     try:
         with open("users.db", "rb") as db_file:
@@ -118,8 +133,9 @@ def download_database():
         st.error("Database file not found!")
 
 # Add this functionality to your app
-if st.sidebar.button("Download Database"):
-    download_database()
+if st.session_state.get('logged_in') and st.session_state['username'] == 'admin':  # Replace 'admin' with your admin username
+    if st.sidebar.button("Download Database"):
+        download_database()
 
 def logout():
     # Clear session state and cookies
