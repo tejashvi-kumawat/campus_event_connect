@@ -1,1 +1,0 @@
-# campus_event_connect
